@@ -7,14 +7,18 @@ import {
   Body,
   Headers,
   Ip,
+  ParseIntPipe,
 } from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
-  @Get('/:id/:optional?')
-  public getUsers(@Param('id') id: any, @Query('limit') limit: any) {
+  @Get('/:id?')
+  public getUsers(
+    @Param('id', ParseIntPipe) id: number | undefined,
+    @Query('limit') limit: any,
+  ) {
+    console.log(typeof id);
     console.log(id);
-    console.log(limit);
     return 'You send a get request to users endpoint';
   }
 
