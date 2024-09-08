@@ -24,7 +24,7 @@ export class Post {
   postType: postType;
 
   @Column({
-    type: 'string',
+    type: 'varchar',
     length: 256,
     nullable: false,
     unique: true,
