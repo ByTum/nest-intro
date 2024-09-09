@@ -44,4 +44,15 @@ export class PostsService {
     });
     return posts;
   }
+
+  public async delete(id: number) {
+    // Find the post
+    const post = await this.postsRepository.findOneBy({ id });
+    // delete the post
+    await this.postsRepository.delete(id);
+    // delete metaOptions
+    await this.metaOptionsRepository.delete(post.metaOptions.id);
+    // confirmation
+    return { deleted: true, id };
+  }
 }
