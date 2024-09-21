@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { User } from './users/user.entity';
 import { TagsModule } from './tags/tags.module';
 import { MetaOptionsModule } from './meta-options/meta-options.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 const ENV = process.env.NODE_ENV;
 @Module({
@@ -22,18 +22,18 @@ const ENV = process.env.NODE_ENV;
       envFilePath: !ENV ? '.env' : `.env.${ENV}`,
     }),
     TypeOrmModule.forRootAsync({
-      imports: [],
-      inject: [],
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         // entities: [User],
         autoLoadEntities: true,
         synchronize: true,
-        port: 5432,
-        host: 'localhost',
-        username: 'postgres',
-        password: 'postgres',
-        database: 'nestjs-blog',
+        port: configService.get('DATABASE_PORT'),
+        host: configService.get('DATABASE_HOST'),
+        username: configService.get('DATABASE_USER'),
+        password: configService.get('DATABASE_PASSWORD'),
+        database: configService.get('DATABASE_NAME'),
       }),
     }),
     TagsModule,

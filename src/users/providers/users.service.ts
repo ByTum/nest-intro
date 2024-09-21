@@ -52,8 +52,8 @@ export class UsersService {
   ) {
     // const isAuth = this.authService.isAuth();
     // console.log(isAuth);
-    const environment = this.configService.get<string>('S3_BUCKET');
-    console.log(environment);
+    // const environment = this.configService.get<string>('S3_BUCKET');
+    // console.log(environment);
     return [
       {
         firstName: 'John',
