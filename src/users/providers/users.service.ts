@@ -1,11 +1,10 @@
 import { CreateUserDto } from './../dtos/create-user.dto';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { GetUsersParamDto } from '../dtos/get-users-param.dto';
-import { AuthService } from 'src/auth/providers/auth.service';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-
+import { ConfigService } from '@nestjs/config';
 /**
  * Class to connect to Users table and perform business oeperations
  */
@@ -20,6 +19,10 @@ export class UsersService {
      */
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    /**
+     * Injective configService
+     */
+    private readonly configService: ConfigService,
     // injective authService
     // @Inject(forwardRef(() => AuthService))
     // private readonly authService: AuthService,
@@ -49,7 +52,8 @@ export class UsersService {
   ) {
     // const isAuth = this.authService.isAuth();
     // console.log(isAuth);
-
+    const environment = this.configService.get<string>('S3_BUCKET');
+    console.log(environment);
     return [
       {
         firstName: 'John',
