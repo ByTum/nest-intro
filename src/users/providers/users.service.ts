@@ -8,7 +8,7 @@ import {
   RequestTimeoutException,
 } from '@nestjs/common';
 import { GetUsersParamDto } from '../dtos/get-users-param.dto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService, ConfigType } from '@nestjs/config';
@@ -32,6 +32,10 @@ export class UsersService {
      */
     @Inject(profileConfig.KEY)
     private readonly profileConfigurations: ConfigType<typeof profileConfig>,
+    /**
+     * Inject datasources
+     */
+    private readonly dataSources: DataSource,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
@@ -122,5 +126,32 @@ export class UsersService {
       throw new BadRequestException('The user id does not exist');
     }
     return user;
+  }
+
+  public async createMany(createUserDto: CreateUserDto[]) {
+    const newUsers: User[] = [];
+    // Create QueryRunner instance
+    const queryRunner = this.dataSources.createQueryRunner();
+
+    // Connect Query Runner to datasource
+    await queryRunner.connect();
+
+    // Start Transaction
+    await queryRunner.startTransaction();
+    try {
+      for (const user of createUserDto) {
+        const newUser = queryRunner.manager.create(User, user);
+        const result = await queryRunner.manager.save(newUser);
+        newUsers.push(result);
+      }
+      // If Successfull commit
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      // If unsessfull rollback
+      await queryRunner.rollbackTransaction();
+    } finally {
+      // Release connection
+      await queryRunner.release();
+    }
   }
 }
