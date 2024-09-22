@@ -1,6 +1,8 @@
 import { CreateUserDto } from './../dtos/create-user.dto';
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   RequestTimeoutException,
@@ -81,19 +83,20 @@ export class UsersService {
     limit: number,
     page: number,
   ) {
-    // test the new config
-    console.log(this.profileConfigurations);
-    console.log(this.profileConfigurations.apiKey);
-    return [
+    throw new HttpException(
       {
-        firstName: 'John',
-        email: 'john@gmail.com',
+        status: HttpStatus.MOVED_PERMANENTLY,
+        error: 'The API endpoint does not exist',
+        fileName: 'users.service.ts',
+        lineNumber: 90,
       },
+      HttpStatus.MOVED_PERMANENTLY,
       {
-        firstName: 'kk',
-        email: 'kk@gmail.com',
+        // Not send to the client
+        cause: new Error(),
+        description: 'Occured because the API endpoint was permanently moved',
       },
-    ];
+    );
   }
 
   /**
