@@ -60,7 +60,16 @@ export class UsersService {
     }
     // Create a new user
     let newUser = this.usersRepository.create(createUserDto);
-    newUser = await this.usersRepository.save(newUser);
+    try {
+      newUser = await this.usersRepository.save(newUser);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
+    }
 
     return newUser;
   }
@@ -91,6 +100,24 @@ export class UsersService {
    * Find a single user using the ID of the user
    */
   public async findOneById(id: number) {
-    return await this.usersRepository.findOneBy({ id });
+    let user = undefined;
+    try {
+      user = await this.usersRepository.findOneBy({ id });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error connecting to the database',
+        },
+      );
+    }
+
+    /**
+     * Handle the use does not exist
+     */
+    if (!user) {
+      throw new BadRequestException('The user id does not exist');
+    }
+    return user;
   }
 }
