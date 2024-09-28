@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import profileConfig from '../config/profile.config';
 import { UsersCreateManyProvider } from './users-create-many.provider';
+import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
 /**
  * Class to connect to Users table and perform business oeperations
  */
@@ -133,7 +134,7 @@ export class UsersService {
     return user;
   }
 
-  public async createMany(createUserDto: CreateUserDto[]) {
-    return this.usersCreateManyProvider.createMany(createUserDto);
+  public async createMany(createManyUsersDto: CreateManyUsersDto) {
+    return this.usersCreateManyProvider.createMany(createManyUsersDto);
   }
 }
