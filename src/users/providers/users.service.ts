@@ -15,6 +15,7 @@ import { ConfigService, ConfigType } from '@nestjs/config';
 import profileConfig from '../config/profile.config';
 import { UsersCreateManyProvider } from './users-create-many.provider';
 import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
+import { CreateUserProvider } from './create-user-provider';
 /**
  * Class to connect to Users table and perform business oeperations
  */
@@ -42,48 +43,14 @@ export class UsersService {
      * Inject usersCreateManyProvider
      */
     private readonly usersCreateManyProvider: UsersCreateManyProvider,
+    /**
+     * Inject createUserProvider
+     */
+    private readonly createUserProvider: CreateUserProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
-    let existingUser = undefined;
-    // check email is exist with same email
-    try {
-      existingUser = await this.usersRepository.findOne({
-        where: {
-          email: createUserDto.email,
-        },
-      });
-    } catch (error) {
-      // might save the details of the excenption
-      // Information which is sensitive
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment please try later',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
-    }
-
-    // Handle exception
-    if (existingUser) {
-      throw new BadRequestException(
-        'The use already exists, please check your email.',
-      );
-    }
-    // Create a new user
-    let newUser = this.usersRepository.create(createUserDto);
-    try {
-      newUser = await this.usersRepository.save(newUser);
-    } catch (error) {
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment please try later',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
-    }
-
-    return newUser;
+    return this.createUserProvider.createUser(createUserDto);
   }
   /**
    * The mothod to get all users from the database
