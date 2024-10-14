@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+// import { Observable } from 'rxjs';
 import { AccessTokenGuard } from '../access-token/access-token.guard';
 import { Reflector } from '@nestjs/core';
 import { AuthType } from 'src/auth/enums/auth-type.enum';
@@ -32,24 +32,24 @@ export class AuthenticationGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]) ?? [AuthenticationGuard.defaultAuthType];
-    console.log('authTypes', authTypes);
+    // console.log('authTypes', authTypes);
 
     // array of guards
     const guards = authTypes.map((type) => this.authTypeGuardMap[type]).flat();
-    console.log('guards', guards);
+    // console.log('guards', guards);
 
     // Default error
     const error = new UnauthorizedException();
 
     // Loop guards canActivate
     for (const instance of guards) {
-      console.log('instance', instance);
+      // console.log('instance', instance);
       const canActivate = await Promise.resolve(
         instance.canActivate(context),
       ).catch((err) => {
         error: err;
       });
-      console.log('canActivate', canActivate);
+      // console.log('canActivate', canActivate);
       if (canActivate) {
         return true;
       }
