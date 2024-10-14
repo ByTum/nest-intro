@@ -1,5 +1,7 @@
+import { CreatePostProvider } from './create-post.provider';
 import {
   BadRequestException,
+  Body,
   Injectable,
   RequestTimeoutException,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { PatchPostDto } from '../dtos/patch-post.dto';
 import { GetPostsDto } from '../dtos/get-posts.dto';
 import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
 import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
 
 @Injectable()
 export class PostsService {
@@ -40,24 +43,18 @@ export class PostsService {
      * Injecting PaginationProvider
      */
     private readonly paginationProvider: PaginationProvider,
+    /**
+     * Injecting createPostProvider
+     */
+    private readonly createPostProvider: CreatePostProvider,
   ) {}
 
   /**
    * creting new posts
    */
-  public async create(createPostDto: CreatePostDto) {
-    // Find author from database base on authorId
-    const author = await this.usersService.findOneById(createPostDto.authorId);
-    // Find Tags
-    const tags = await this.tagsService.findMultipleTags(createPostDto.tags);
-    // Create post
-    const post = this.postsRepository.create({
-      ...createPostDto,
-      author: author,
-      tags: tags,
-    });
+  public async create(createPostDto: CreatePostDto, user: ActiveUserData) {
     // return the post
-    return await this.postsRepository.save(post);
+    return await this.createPostProvider.create(createPostDto, user);
   }
 
   public async findAll(
